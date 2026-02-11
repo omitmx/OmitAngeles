@@ -1,0 +1,38 @@
+# Flutter/Dart
+omittaxi/.dart_tool/
+omittaxi/build/
+omittaxi/.flutter-plugins
+omittaxi/.flutter-plugins-dependencies
+omittaxi/.packages
+omittaxi/pubspec.lock
+omittaxi/.idea/
+omittaxi/*.iml
+omittaxi/.vscode/
+
+# Node.js
+omittaxiapi/node_modules/
+omittaxiapi/package-lock.json
+omittaxiapi/.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Archivos temporales
+*.tmp
+*.bak
+*.cache
