@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/ride_model.dart';
+import '../services/ride_service.dart';
 import 'package:uuid/uuid.dart';
 
 class RideProvider with ChangeNotifier {
@@ -8,6 +9,7 @@ class RideProvider with ChangeNotifier {
   List<RideModel> _rideHistory = [];
   LatLng? _currentLocation;
   final List<RideModel> _availableRides = [];
+  final RideService _rideService = RideService();
 
   RideModel? get currentRide => _currentRide;
   List<RideModel> get rideHistory => _rideHistory;
@@ -77,23 +79,59 @@ class RideProvider with ChangeNotifier {
     }
   }
 
-  void completeRide() {
-    if (_currentRide != null) {
-      _currentRide = _currentRide!.copyWith(
-        status: 'completed',
-        dropoffTime: DateTime.now(),
-      );
-      _rideHistory.insert(0, _currentRide!);
-      notifyListeners();
+  Future<Map<String, dynamic>> completeRide(String rideId) async {
+    if (_currentRide == null) {
+      return {'success': false, 'message': 'No hay viaje activo'};
+    }
+
+    try {
+      final result = await _rideService.completeRide(rideId);
+      
+      if (result['success']) {
+        // Actualizar el estado local
+        _currentRide = _currentRide!.copyWith(
+          status: 'completed',
+          dropoffTime: DateTime.now(),
+        );
+        _rideHistory.insert(0, _currentRide!);
+        _currentRide = null; // Limpiar el viaje actual
+        notifyListeners();
+      }
+      
+      return result;
+    } catch (e) {
+      debugPrint('Error al completar viaje: $e');
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
     }
   }
 
-  void cancelRide() {
-    if (_currentRide != null) {
+  Future<Map<String, dynamic>> cancelRide({String reason = 'Cancelado por el usuario'}) async {
+    if (_currentRide == null) {
+      return {'success': false, 'message': 'No hay viaje activo'};
+    }
+
+    try {
+      final result = await _rideService.cancelRide(_currentRide!.id, reason);
+      
+      if (result['success'] == true) {
+        _currentRide = _currentRide!.copyWith(status: 'cancelled');
+        _rideHistory.insert(0, _currentRide!);
+        _currentRide = null;
+        notifyListeners();
+        return {'success': true, 'message': 'Viaje cancelado exitosamente'};
+      } else {
+        return result;
+      }
+    } catch (e) {
+      // Si hay error de conexión, cancelar localmente
       _currentRide = _currentRide!.copyWith(status: 'cancelled');
       _rideHistory.insert(0, _currentRide!);
       _currentRide = null;
       notifyListeners();
+      return {'success': true, 'message': 'Viaje cancelado (sin conexión)'};
     }
   }
 
@@ -119,6 +157,41 @@ class RideProvider with ChangeNotifier {
   void clearCurrentRide() {
     _currentRide = null;
     notifyListeners();
+  }
+
+  void setCurrentRide(RideModel ride) {
+    _currentRide = ride;
+    notifyListeners();
+  }
+
+  // Verificar si hay un viaje activo
+  Future<Map<String, dynamic>> checkActiveRide() async {
+    try {
+      final result = await _rideService.checkActiveRide();
+      
+      if (result['success'] == true && result['hasActiveRide'] == true) {
+        final ride = RideModel.fromJson(result['data']);
+        _currentRide = ride;
+        notifyListeners();
+        return {
+          'success': true,
+          'hasActiveRide': true,
+          'ride': ride,
+        };
+      } else {
+        _currentRide = null;
+        return {
+          'success': true,
+          'hasActiveRide': false,
+        };
+      }
+    } catch (e) {
+      debugPrint('Error al verificar viaje activo: $e');
+      return {
+        'success': false,
+        'message': 'Error: ${e.toString()}',
+      };
+    }
   }
 
   // Simulación de viajes disponibles para conductores

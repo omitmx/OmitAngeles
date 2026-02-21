@@ -1,4 +1,4 @@
-package com.example.omittaxi
+package com.omitmx.omittaxi
 
 import io.flutter.embedding.android.FlutterActivity
 

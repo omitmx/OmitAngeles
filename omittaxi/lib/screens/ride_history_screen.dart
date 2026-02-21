@@ -123,23 +123,24 @@ class RideHistoryScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Text(
-                        'Tarifa',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      Text(
-                        '\$${ride.fare.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2E7D32),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Tarifa eliminada - sin costos
+                  // Column(
+                  //   crossAxisAlignment: CrossAxisAlignment.end,
+                  //   children: [
+                  //     const Text(
+                  //       'Tarifa',
+                  //       style: TextStyle(fontSize: 12, color: Colors.grey),
+                  //     ),
+                  //     Text(
+                  //       '\$${ride.fare.toStringAsFixed(2)}',
+                  //       style: const TextStyle(
+                  //         fontSize: 20,
+                  //         fontWeight: FontWeight.bold,
+                  //         color: Color(0xFF2E7D32),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
               if (ride.passengerRating != null) ...[
@@ -254,7 +255,8 @@ class RideHistoryScreen extends StatelessWidget {
                 'Distancia',
                 '${ride.distance.toStringAsFixed(1)} km',
               ),
-              _buildDetailRow('Tarifa', '\$${ride.fare.toStringAsFixed(2)}'),
+              // Tarifa eliminada
+              // _buildDetailRow('Tarifa', '\$${ride.fare.toStringAsFixed(2)}'),
               _buildDetailRow('Estado', ride.status),
               if (ride.passengerRating != null) ...[
                 const SizedBox(height: 16),

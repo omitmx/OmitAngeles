@@ -1,10 +1,10 @@
 /// Configuración del API Backend
 class ApiConfig {
   // URL base del API (usar IP local para dispositivos físicos)
-  static const String baseUrl = 'http://10.1.7.106:3000/api';
+  static const String baseUrl = 'http://192.168.50.126:3000/api';
 
   // URL para WebSocket (tiempo real)
-  static const String socketUrl = 'http://10.1.7.106:3000';
+  static const String socketUrl = 'http://192.168.50.126:3000';
 
   // Configuración de tarifas
   static const double baseFare = 20.0;

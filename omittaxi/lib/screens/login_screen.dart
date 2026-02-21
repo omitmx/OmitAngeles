@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/socket_service.dart';
+import '../providers/user_provider.dart';
 import 'welcome_screen.dart';
 import 'passenger/passenger_home_screen.dart';
 import 'driver/driver_home_screen.dart';
@@ -20,6 +22,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.text = 'password123'; // Para pruebas rápidas
+  }
 
   @override
   void dispose() {
@@ -45,6 +53,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result['success']) {
         final user = result['user'];
+        
+        // Guardar usuario en el provider
+        if (mounted) {
+          Provider.of<UserProvider>(context, listen: false).login(user);
+        }
 
         // Conectar WebSocket
         await SocketService.connect();

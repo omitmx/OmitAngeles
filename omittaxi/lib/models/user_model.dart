@@ -8,7 +8,9 @@ class UserModel {
   final double rating;
   final int totalRides;
   final Map<String, dynamic>? vehicleInfo; // Info del vehículo para conductores
+  final String? economicNumber; // Número económico de la unidad (conductores)
   final String? licenseNumber; // Licencia de conducir
+  final String? token; // Token de autenticación
 
   UserModel({
     required this.id,
@@ -20,7 +22,9 @@ class UserModel {
     this.rating = 5.0,
     this.totalRides = 0,
     this.vehicleInfo,
+    this.economicNumber,
     this.licenseNumber,
+    this.token,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -34,7 +38,9 @@ class UserModel {
       rating: (json['rating'] ?? 5.0).toDouble(),
       totalRides: json['totalRides'] ?? 0,
       vehicleInfo: json['vehicleInfo'],
+      economicNumber: json['economicNumber'],
       licenseNumber: json['licenseNumber'],
+      token: json['token'],
     );
   }
 
@@ -49,6 +55,7 @@ class UserModel {
       'rating': rating,
       'totalRides': totalRides,
       'vehicleInfo': vehicleInfo,
+      'economicNumber': economicNumber,
       'licenseNumber': licenseNumber,
     };
   }

@@ -32,12 +32,17 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const rideRoutes = require('./routes/rides');
 const driverRoutes = require('./routes/drivers');
+const locationRoutes = require('./routes/location');
 
 // Usar rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/rides', rideRoutes);
 app.use('/api/drivers', driverRoutes);
+app.use('/api/location', locationRoutes);
+
+// Hacer io accesible globalmente
+app.set('io', io);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
@@ -168,5 +173,5 @@ server.listen(PORT, HOST, () => {
   console.log(`\n🚀 Servidor corriendo en puerto ${PORT}`);
   console.log(`📡 WebSocket habilitado para tracking en tiempo real`);
   console.log(`🌐 URL Local: http://localhost:${PORT}`);
-  console.log(`🌐 URL Red: http://10.1.7.106:${PORT}\n`);
+  console.log(`🌐 URL Red: http://192.168.50.126:${PORT}\n`);
 });

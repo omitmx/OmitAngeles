@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema({
     plate: String,
     color: String
   },
+  economicNumber: {
+    type: String,
+    default: null
+  },
   licenseNumber: {
     type: String,
     default: null

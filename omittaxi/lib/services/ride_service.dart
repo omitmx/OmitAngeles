@@ -20,11 +20,14 @@ class RideService {
     String paymentMethod = 'cash',
   }) async {
     try {
+      print('🔐 Obteniendo token...');
       final token = await _authService.getToken();
       if (token == null) {
+        print('❌ No hay token de sesión');
         return {'success': false, 'message': 'No hay sesión activa'};
       }
 
+      print('📡 Enviando POST a ${ApiConfig.baseUrl}/rides/request');
       final response = await http
           .post(
             Uri.parse('${ApiConfig.baseUrl}/rides/request'),
@@ -43,17 +46,37 @@ class RideService {
           )
           .timeout(Duration(seconds: ApiConfig.connectionTimeout));
 
+      print('📨 Respuesta del API: statusCode=${response.statusCode}');
+      print('📨 Body: ${response.body}');
+
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 201 && data['success'] == true) {
-        return {'success': true, 'ride': RideModel.fromJson(data['data'])};
+        print('✅ Parseando datos del viaje...');
+        print('📄 Data del viaje: ${data['data']}');
+        
+        try {
+          final rideModel = RideModel.fromJson(data['data']);
+          print('✅ Modelo creado correctamente');
+          return {'success': true, 'ride': rideModel};
+        } catch (e, stackTrace) {
+          print('❌ Error al parsear RideModel: $e');
+          print('Stack: $stackTrace');
+          return {
+            'success': false,
+            'message': 'Error al procesar datos del viaje: ${e.toString()}',
+          };
+        }
       } else {
+        print('⚠️ Respuesta no exitosa del API');
         return {
           'success': false,
           'message': data['message'] ?? 'Error al solicitar viaje',
         };
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ Error en requestRide: $e');
+      print('Stack: $stackTrace');
       return {
         'success': false,
         'message': 'Error de conexión: ${e.toString()}',
@@ -353,6 +376,47 @@ class RideService {
         return {
           'success': false,
           'message': data['message'] ?? 'Error al obtener viaje',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error de conexión: ${e.toString()}',
+      };
+    }
+  }
+
+  // Verificar si hay un viaje activo
+  Future<Map<String, dynamic>> checkActiveRide() async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No hay sesión activa'};
+      }
+
+      final response = await http
+          .get(
+            Uri.parse('${ApiConfig.baseUrl}/rides/active/check'),
+            headers: ApiConfig.headersWithAuth(token),
+          )
+          .timeout(Duration(seconds: ApiConfig.connectionTimeout));
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        if (data['hasActiveRide'] == true && data['data'] != null) {
+          return {
+            'success': true,
+            'hasActiveRide': true,
+            'ride': RideModel.fromJson(data['data'])
+          };
+        } else {
+          return {'success': true, 'hasActiveRide': false, 'ride': null};
+        }
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Error al verificar viaje',
         };
       }
     } catch (e) {
